@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx prisma migrate deploy && npx prisma generate && node index.js",
-    "dev": "nodemon index.js",
-    "test": "jest --runInBand"
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -35,8 +34,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "jest": "^30.4.2",
-    "nodemon": "^3.1.14",
-    "supertest": "^7.2.2"
+    "nodemon": "^3.1.14"
   }
 }
