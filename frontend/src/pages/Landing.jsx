@@ -137,7 +137,7 @@ const Landing = () => {
   useEffect(() => {
     const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-    fetch(`${apiBase}/stats/public`)
+    fetch(`${apiBase}/api/stats/public`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {

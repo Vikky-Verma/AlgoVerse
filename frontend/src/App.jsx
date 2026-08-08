@@ -32,16 +32,17 @@ import Community from "./pages/Community";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 
-function App() {
+const App = () => {
   useEffect(() => {
     // Records a visit every time the app loads. Talks to your backend's
     // /api/stats/visit endpoint, which increments SiteStats.visitCount.
     const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-    fetch(`${apiBase}/stats/visit`, { method: "POST" }).catch((err) =>
+    fetch(`${apiBase}/api/stats/visit`, { method: "POST" }).catch((err) =>
       console.error("Failed to record visit:", err)
     );
   }, []);
+
 
   return (
     <AuthProvider>
