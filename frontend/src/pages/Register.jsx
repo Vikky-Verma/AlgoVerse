@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import toast from "react-hot-toast";
 import { FileText, User, Mail, Lock, Loader2 } from "lucide-react";
-import TiltCard from "../components/effects/TiltCard";
 import MagneticButton from "../components/effects/MagneticButton";
 
 const passwordChecks = [
@@ -61,7 +60,7 @@ const Register = () => {
           <p className="text-slate-400 text-sm mt-2">Start your placement journey with AlgoVerse</p>
         </div>
 
-        <TiltCard maxTilt={5} className="bg-[#1a1d2e]/80 backdrop-blur-xl border border-[#2e3150] rounded-2xl p-8">
+        <div className="bg-[#1a1d2e]/80 backdrop-blur-xl border border-[#2e3150] rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {fields.map(({ key, type, icon: Icon, placeholder, label }) => (
               <div key={key}>
@@ -111,7 +110,7 @@ const Register = () => {
               {loading ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : "Create Account"}
             </MagneticButton>
           </form>
-        </TiltCard>
+        </div>
 
         <p className="text-center mt-5 text-sm text-slate-400">
           Already have an account?{" "}

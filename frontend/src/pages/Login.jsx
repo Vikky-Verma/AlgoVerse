@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
 import toast from "react-hot-toast";
 import { FileText, Mail, Lock, Loader2 } from "lucide-react";
-import TiltCard from "../components/effects/TiltCard";
 import MagneticButton from "../components/effects/MagneticButton";
 
 const Login = () => {
@@ -48,7 +47,7 @@ const Login = () => {
         </div>
 
         {/* Card */}
-        <TiltCard maxTilt={5} className="bg-[#1a1d2e]/80 backdrop-blur-xl border border-[#2e3150] rounded-2xl p-8">
+        <div className="bg-[#1a1d2e]/80 backdrop-blur-xl border border-[#2e3150] rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
               <label className="text-xs font-semibold text-slate-400 mb-2 block uppercase tracking-wide">
@@ -93,7 +92,7 @@ const Login = () => {
               {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in...</> : "Sign In"}
             </MagneticButton>
           </form>
-        </TiltCard>
+        </div>
 
         <p className="text-center mt-5 text-sm text-slate-400">
           Don't have an account?{" "}
