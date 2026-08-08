@@ -31,7 +31,7 @@ app.set("trust proxy", 1);
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://algo-verse-nu-cyan.vercel.app",
+    "https://algo-verse-ten.vercel.app",
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
