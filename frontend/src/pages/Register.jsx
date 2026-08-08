@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import toast from "react-hot-toast";
 import { FileText, User, Mail, Lock, Loader2 } from "lucide-react";
-import MagneticButton from "../components/effects/MagneticButton";
 
 const passwordChecks = [
   { label: "At least 8 characters", test: (pw) => pw.length >= 8 },
@@ -51,7 +50,6 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10 relative">
       <div className="w-full max-w-md">
-
         <div className="text-center mb-8">
           <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[0_0_24px_rgba(99,102,241,0.45)]">
             <FileText size={26} className="text-white" />
@@ -101,14 +99,13 @@ const Register = () => {
               </div>
             ))}
 
-            <MagneticButton
-              as="button"
+            <button
               type="submit"
               disabled={loading}
               className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all mt-1"
             >
               {loading ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : "Create Account"}
-            </MagneticButton>
+            </button>
           </form>
         </div>
 

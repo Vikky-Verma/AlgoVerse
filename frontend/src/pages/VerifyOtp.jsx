@@ -3,8 +3,6 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
 import toast from "react-hot-toast";
 import { MailCheck, Loader2 } from "lucide-react";
-import TiltCard from "../components/effects/TiltCard";
-import MagneticButton from "../components/effects/MagneticButton";
 
 const VerifyOtp = () => {
   const location = useLocation();
@@ -97,7 +95,7 @@ const VerifyOtp = () => {
           </p>
         </div>
 
-        <TiltCard maxTilt={5} className="bg-[#1a1d2e]/80 backdrop-blur-xl border border-[#2e3150] rounded-2xl p-8">
+        <div className="bg-[#1a1d2e]/80 backdrop-blur-xl border border-[#2e3150] rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex justify-between gap-2" onPaste={handlePaste}>
               {digits.map((d, idx) => (
@@ -115,8 +113,7 @@ const VerifyOtp = () => {
               ))}
             </div>
 
-            <MagneticButton
-              as="button"
+            <button
               type="submit"
               disabled={loading}
               className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
@@ -128,7 +125,7 @@ const VerifyOtp = () => {
               ) : (
                 "Verify Email"
               )}
-            </MagneticButton>
+            </button>
           </form>
 
           <div className="text-center mt-5">
@@ -144,7 +141,7 @@ const VerifyOtp = () => {
               </button>
             )}
           </div>
-        </TiltCard>
+        </div>
 
         <p className="text-center mt-5 text-sm text-slate-400">
           Wrong email?{" "}
