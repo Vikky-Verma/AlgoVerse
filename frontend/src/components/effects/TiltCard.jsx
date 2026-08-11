@@ -7,3 +7,4 @@ const TiltCard = ({ children, className = "", style, maxTilt, ...props }) => {
 };
 
 export default TiltCard;
+

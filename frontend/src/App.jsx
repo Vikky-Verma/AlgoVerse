@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import {BrowserRouter,Routes,Route,} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
@@ -325,7 +325,7 @@ const App = () => {
 
 
             {/* =================================
-                ⭐ UPDATED RESUME BUILDER
+                ? UPDATED RESUME BUILDER
             ================================= */}
 
             <Route

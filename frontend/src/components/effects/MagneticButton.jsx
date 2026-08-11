@@ -1,4 +1,4 @@
-﻿const MagneticButton = ({ as: Tag = "button", children, className = "", onClick, ...props }) => {
+const MagneticButton = ({ as: Tag = "button", children, className = "", onClick, ...props }) => {
   return (
     <Tag className={className} onClick={onClick} {...props}>
       {children}
@@ -7,3 +7,4 @@
 };
 
 export default MagneticButton;
+

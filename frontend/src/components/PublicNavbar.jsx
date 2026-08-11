@@ -70,3 +70,4 @@ const PublicNavbar = () => {
 };
 
 export default PublicNavbar;
+
