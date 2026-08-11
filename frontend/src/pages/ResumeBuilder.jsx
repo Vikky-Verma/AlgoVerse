@@ -590,6 +590,13 @@ const ResumeBuilder = () => {
     <div className="min-h-screen">
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-8 pb-4">
+        <div className="pb-6 mb-4 border-b border-[#1c1e28]">
+          <h1 className="text-xl font-bold text-white">Resume Builder</h1>
+          <p className="text-slate-500 text-[13px] mt-1">
+            Build, tailor, and export an ATS-friendly resume in minutes.
+          </p>
+        </div>
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-[220px]">
             <input
@@ -708,16 +715,19 @@ const ResumeBuilder = () => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-16 grid lg:grid-cols-[220px_1fr_450px] gap-5">
-        <div className="lg:hidden">
-          <StepperRail
-            orientation="horizontal"
-            sections={sectionStatus}
-            activeId={activeSection}
-            onSelect={setActiveSection}
-          />
-        </div>
-        <div className="hidden lg:block">
-          <StepperRail sections={sectionStatus} activeId={activeSection} onSelect={setActiveSection} />
+        <div>
+          <h2 className="text-sm font-bold text-white mb-3 px-1">Resume Builder</h2>
+          <div className="lg:hidden">
+            <StepperRail
+              orientation="horizontal"
+              sections={sectionStatus}
+              activeId={activeSection}
+              onSelect={setActiveSection}
+            />
+          </div>
+          <div className="hidden lg:block">
+            <StepperRail sections={sectionStatus} activeId={activeSection} onSelect={setActiveSection} />
+          </div>
         </div>
 
         <div className="min-w-0">{renderSection()}</div>

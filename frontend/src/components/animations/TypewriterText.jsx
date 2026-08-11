@@ -14,7 +14,10 @@ const TypewriterText = ({
   className = "",
 }) => {
   const [wordIndex, setWordIndex] = useState(0);
-  const [text, setText] = useState("");
+  // Seed with the first word immediately so there's never a blank frame
+  // while waiting on the effect below (guards against any mount-timing
+  // differences between environments).
+  const [text, setText] = useState(words[0] || "");
   const [phase, setPhase] = useState("typing"); // typing | pausing | deleting
 
   const prefersReducedMotion =

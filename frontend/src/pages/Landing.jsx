@@ -184,7 +184,9 @@ const Landing = () => {
           className="relative text-5xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight"
         >
           Get Placed As A <br />
-          <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-teal-300 bg-clip-text text-transparent">
+          <span
+            className="bg-gradient-to-r from-indigo-400 via-violet-400 to-teal-300 bg-clip-text [-webkit-text-fill-color:transparent] text-indigo-300"
+          >
             <TypewriterText words={TAGLINES} />
           </span>
         </motion.h1>
