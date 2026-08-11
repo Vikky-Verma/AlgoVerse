@@ -77,10 +77,13 @@ body {
     visibility: hidden;
   }
   #resume-to-print,
-  #resume-to-print * {
+  #resume-to-print *,
+  #portfolio-to-print,
+  #portfolio-to-print * {
     visibility: visible;
   }
-  #resume-to-print {
+  #resume-to-print,
+  #portfolio-to-print {
     position: absolute;
     top: 0;
     left: 0;

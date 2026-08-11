@@ -1,4 +1,4 @@
-﻿const TiltCard = ({ children, className = "", style, ...props }) => {
+const TiltCard = ({ children, className = "", style, maxTilt, ...props }) => {
   return (
     <div className={className} style={style} {...props}>
       {children}

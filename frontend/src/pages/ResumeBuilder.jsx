@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import API from "../api/axios";
 import toast from "react-hot-toast";
 import ResumePreview from "../components/resumeBuilder/ResumePreview";
+import StepperRail from "../components/shared/StepperRail";
+import CompletionSummary from "../components/shared/CompletionSummary";
 import { RESUME_TEMPLATES, getTemplate } from "../data/resumeTemplates";
 import { COMPANY_PRESETS, getCompanyPreset } from "../data/companyPresets";
 import {
@@ -23,6 +25,11 @@ import {
   Award,
   ChevronRight,
   Check,
+  Copy,
+  RefreshCw,
+  Maximize2,
+  Minimize2,
+  Printer,
 } from "lucide-react";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -143,15 +150,44 @@ const EntryCard = ({ index, label, onRemove, children }) => (
 const ResumeBuilder = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [resumes, setResumes] = useState([]);
   const [currentId, setCurrentId] = useState(null);
   const [resume, setResume] = useState(blankResume());
   const [activeSection, setActiveSection] = useState("personal");
   const [showTemplates, setShowTemplates] = useState(false);
   const [showCompanies, setShowCompanies] = useState(false);
+  const savedSnapshot = useRef(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [previewExpanded, setPreviewExpanded] = useState(false);
 
   const template = getTemplate(resume.templateId);
   const companyPreset = getCompanyPreset(resume.companyId);
+
+  const sectionStatus = useMemo(() => {
+    const p = resume.personalInfo || {};
+    const doneMap = {
+      personal: Boolean(p.fullName?.trim() && p.role?.trim() && p.email?.trim()),
+      summary: Boolean(resume.summary?.trim()),
+      experience: (resume.experience || []).length > 0,
+      education: (resume.education || []).length > 0,
+      projects: (resume.projects || []).length > 0,
+      skills: (resume.skills || []).some((g) => (g.items || []).length > 0),
+      achievements: (resume.achievements || []).length > 0,
+      certifications: (resume.certifications || []).length > 0,
+    };
+    return SECTIONS.map((s) => ({ ...s, done: doneMap[s.id] }));
+  }, [resume]);
+
+  const strengthScore = useMemo(() => {
+    const doneCount = sectionStatus.filter((s) => s.done).length;
+    return Math.round((doneCount / sectionStatus.length) * 100);
+  }, [sectionStatus]);
+
+  const missingSections = useMemo(
+    () => sectionStatus.filter((s) => !s.done).map((s) => s.label),
+    [sectionStatus]
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -162,12 +198,16 @@ const ResumeBuilder = () => {
         setResumes(list);
         if (list.length > 0) {
           setCurrentId(list[0].id);
-          setResume({ ...blankResume(), ...list[0] });
+          const loaded = { ...blankResume(), ...list[0] };
+          setResume(loaded);
+          savedSnapshot.current = JSON.stringify(loaded);
         } else {
           const created = await API.post("/resume-builder", blankResume());
+          const loaded = { ...blankResume(), ...created.data.data.resume };
           setResumes([created.data.data.resume]);
           setCurrentId(created.data.data.resume.id);
-          setResume({ ...blankResume(), ...created.data.data.resume });
+          setResume(loaded);
+          savedSnapshot.current = JSON.stringify(loaded);
         }
       } catch (err) {
         toast.error(err.response?.data?.message || "Couldn't load your resumes.");
@@ -177,6 +217,13 @@ const ResumeBuilder = () => {
     };
     load();
   }, []);
+
+  // Tracks whether the open resume has edits that haven't been saved yet,
+  // so the toolbar can show "All changes saved" vs "Unsaved changes".
+  useEffect(() => {
+    if (loading) return;
+    setIsDirty(JSON.stringify(resume) !== savedSnapshot.current);
+  }, [resume, loading]);
 
   const patch = useCallback((fields) => setResume((r) => ({ ...r, ...fields })), []);
   const patchPersonal = (field) => (e) =>
@@ -195,7 +242,10 @@ const ResumeBuilder = () => {
       const { id, userId, createdAt, updatedAt, ...body } = resume;
       const res = await API.put(`/resume-builder/${currentId}`, body);
       const saved = res.data.data.resume;
-      setResume((r) => ({ ...r, ...saved }));
+      const merged = { ...resume, ...saved };
+      setResume(merged);
+      savedSnapshot.current = JSON.stringify(merged);
+      setIsDirty(false);
       setResumes((list) => list.map((r) => (r.id === currentId ? saved : r)));
       toast.success("Resume saved");
     } catch (err) {
@@ -209,9 +259,11 @@ const ResumeBuilder = () => {
     try {
       const res = await API.post("/resume-builder", blankResume());
       const created = res.data.data.resume;
+      const loaded = { ...blankResume(), ...created };
       setResumes((list) => [created, ...list]);
       setCurrentId(created.id);
-      setResume({ ...blankResume(), ...created });
+      setResume(loaded);
+      savedSnapshot.current = JSON.stringify(loaded);
       setActiveSection("personal");
       toast.success("New resume created");
     } catch (err) {
@@ -223,12 +275,81 @@ const ResumeBuilder = () => {
     if (id === currentId) return;
     try {
       const res = await API.get(`/resume-builder/${id}`);
+      const loaded = { ...blankResume(), ...res.data.data.resume };
       setCurrentId(id);
-      setResume({ ...blankResume(), ...res.data.data.resume });
+      setResume(loaded);
+      savedSnapshot.current = JSON.stringify(loaded);
       setActiveSection("personal");
     } catch (err) {
       toast.error(err.response?.data?.message || "Couldn't load that resume");
     }
+  };
+
+  // Duplicates the currently open resume into a brand new saved resume.
+  const handleDuplicate = async () => {
+    try {
+      const { id, userId, createdAt, updatedAt, ...body } = resume;
+      const res = await API.post("/resume-builder", {
+        ...body,
+        title: `${resume.title || "Untitled Resume"} (Copy)`,
+      });
+      const created = res.data.data.resume;
+      const loaded = { ...blankResume(), ...created };
+      setResumes((list) => [created, ...list]);
+      setCurrentId(created.id);
+      setResume(loaded);
+      savedSnapshot.current = JSON.stringify(loaded);
+      setActiveSection("personal");
+      toast.success("Resume duplicated");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Couldn't duplicate this resume");
+    }
+  };
+
+  // Permanently deletes the currently open resume.
+  const handleDelete = async () => {
+    if (resumes.length <= 1) {
+      toast.error("You need at least one resume — create another before deleting this one.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `Delete "${resume.title || "Untitled Resume"}"? This can't be undone.`
+    );
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      await API.delete(`/resume-builder/${currentId}`);
+      const remaining = resumes.filter((r) => r.id !== currentId);
+      const next = remaining[0];
+      const loaded = { ...blankResume(), ...next };
+      setResumes(remaining);
+      setCurrentId(next.id);
+      setResume(loaded);
+      savedSnapshot.current = JSON.stringify(loaded);
+      setActiveSection("personal");
+      toast.success("Resume deleted");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Couldn't delete this resume");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Clears every field on the currently open resume and starts it over from
+  // scratch. This only touches local state — nothing is saved until the
+  // user hits Save — but it does discard any unsaved edits, so we confirm
+  // with the user first.
+  const handleRefresh = () => {
+    const confirmed = window.confirm(
+      "This will clear everything on this resume and start it over from the beginning. Any unsaved changes will be lost. Continue?"
+    );
+    if (!confirmed) return;
+
+    setResume((r) => ({ ...blankResume(), id: r.id }));
+    setActiveSection("personal");
+    window.alert("Resume reset. You're starting fresh from Personal Info.");
+    toast.success("Resume reset from the start");
   };
 
   const applyCompanyPreset = (companyId) => {
@@ -491,6 +612,15 @@ const ResumeBuilder = () => {
             <button onClick={handleNewResume} className="flex items-center gap-1.5 bg-[#12141c] border border-[#20222c] hover:border-indigo-500/40 text-slate-300 hover:text-white text-xs font-semibold rounded-lg px-3 py-2 transition-colors">
               <Plus size={13} /> New
             </button>
+            <button onClick={handleDuplicate} className="flex items-center gap-1.5 bg-[#12141c] border border-[#20222c] hover:border-indigo-500/40 text-slate-300 hover:text-white text-xs font-semibold rounded-lg px-3 py-2 transition-colors">
+              <Copy size={13} /> Duplicate
+            </button>
+            <button onClick={handleRefresh} className="flex items-center gap-1.5 bg-[#12141c] border border-[#20222c] hover:border-amber-500/40 text-slate-300 hover:text-white text-xs font-semibold rounded-lg px-3 py-2 transition-colors">
+              <RefreshCw size={13} /> Refresh
+            </button>
+            <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-1.5 bg-[#12141c] border border-[#20222c] hover:border-rose-500/40 text-slate-300 hover:text-rose-400 text-xs font-semibold rounded-lg px-3 py-2 transition-colors disabled:opacity-60">
+              {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />} Delete
+            </button>
             <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-xs rounded-lg px-4 py-2 transition-colors disabled:opacity-60">
               {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} Save
             </button>
@@ -498,6 +628,20 @@ const ResumeBuilder = () => {
               <Download size={13} /> Download PDF
             </button>
           </div>
+        </div>
+
+        <p className="mt-2 text-xs font-medium">
+          {saving ? (
+            <span className="text-slate-500">Saving...</span>
+          ) : isDirty ? (
+            <span className="text-amber-400">Unsaved changes</span>
+          ) : (
+            <span className="text-emerald-400">All changes saved</span>
+          )}
+        </p>
+
+        <div className="mt-4">
+          <CompletionSummary label="Resume Strength" score={strengthScore} missing={missingSections} />
         </div>
 
         <div className="flex flex-wrap gap-2.5 mt-4">
@@ -563,29 +707,77 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-16 grid lg:grid-cols-[220px_1fr_auto] gap-5">
-        <div className="flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible">
-          {SECTIONS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActiveSection(s.id)}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                activeSection === s.id ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/30" : "text-slate-400 hover:bg-[#12141c] border border-transparent"
-              }`}
-            >
-              <s.icon size={14} /> {s.label}
-            </button>
-          ))}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-16 grid lg:grid-cols-[220px_1fr_450px] gap-5">
+        <div className="lg:hidden">
+          <StepperRail
+            orientation="horizontal"
+            sections={sectionStatus}
+            activeId={activeSection}
+            onSelect={setActiveSection}
+          />
+        </div>
+        <div className="hidden lg:block">
+          <StepperRail sections={sectionStatus} activeId={activeSection} onSelect={setActiveSection} />
         </div>
 
         <div className="min-w-0">{renderSection()}</div>
 
         <div className="hidden xl:block">
-          <div className="sticky top-6 origin-top" style={{ transform: "scale(0.55)", transformOrigin: "top" }}>
-            <ResumePreview resume={resume} />
+          <div className="sticky top-6">
+            <div className="flex items-center justify-between bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-1.5 mb-2">
+              <span className="text-[11px] font-medium text-slate-500">55%</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPreviewExpanded(true)}
+                  className="p-1.5 rounded-md text-slate-500 hover:text-white hover:bg-[#1c1e28] transition-colors"
+                  aria-label="Expand preview"
+                >
+                  <Maximize2 size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  className="p-1.5 rounded-md text-slate-500 hover:text-white hover:bg-[#1c1e28] transition-colors"
+                  aria-label="Print resume"
+                >
+                  <Printer size={13} />
+                </button>
+              </div>
+            </div>
+            <div style={{ transform: "scale(0.55)", transformOrigin: "top left" }}>
+              <ResumePreview resume={resume} />
+            </div>
           </div>
         </div>
       </div>
+
+      {previewExpanded && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center overflow-auto py-10 px-4"
+          onClick={() => setPreviewExpanded(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative">
+            <div className="sticky top-0 flex items-center justify-end gap-2 mb-3 z-10">
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-1.5 transition-colors"
+              >
+                <Printer size={13} /> Print
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewExpanded(false)}
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-1.5 transition-colors"
+              >
+                <Minimize2 size={13} /> Close
+              </button>
+            </div>
+            <ResumePreview resume={resume} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

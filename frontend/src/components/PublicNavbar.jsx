@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { FileText } from "lucide-react";
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 // Lightweight header shown to logged-out visitors — used on the Landing
 // page and on any public page (About, Contact) reached without being
