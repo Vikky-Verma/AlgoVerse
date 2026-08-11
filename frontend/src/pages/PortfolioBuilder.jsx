@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 const blankPortfolioFields = () => ({
+  displayName: "",
   headline: "",
   bio: "",
   skills: [],
@@ -232,8 +233,8 @@ const PortfolioBuilder = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { headline, bio, skills, projects, links, slug } = portfolio;
-      const res = await API.put("/portfolio/me", { headline, bio, skills, projects, links, slug });
+      const { displayName, headline, bio, skills, projects, links, slug } = portfolio;
+      const res = await API.put("/portfolio/me", { displayName, headline, bio, skills, projects, links, slug });
       setPortfolio(res.data.data.portfolio);
       savedSnapshot.current = JSON.stringify(res.data.data.portfolio);
       setIsDirty(false);
@@ -433,6 +434,20 @@ const PortfolioBuilder = () => {
               <div>
                 <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-3">Profile</p>
                 <div>
+                  <label className="text-[11px] font-medium text-slate-500 mb-1.5 block">Display Name</label>
+                  <input
+                    type="text"
+                    value={portfolio.displayName || ""}
+                    onChange={(e) => updateField("displayName")(e.target.value)}
+                    placeholder={user?.name || "Your Name"}
+                    className="w-full bg-[#12141c] border border-[#20222c] rounded-lg px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/60 transition-colors"
+                  />
+                  <p className="text-[11px] text-slate-600 mt-1.5">
+                    Shown on your public page instead of your account name. Leave blank to use "{user?.name || "your account name"}".
+                  </p>
+                </div>
+
+                <div className="mt-4">
                   <label className="text-[11px] font-medium text-slate-500 mb-1.5 block">Headline</label>
                   <input
                     type="text"
@@ -607,7 +622,7 @@ const PortfolioBuilder = () => {
                     <select
                       value={selectedResumeId}
                       onChange={(e) => setSelectedResumeId(e.target.value)}
-                      className="flex-1 bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500/60"
+                      className="flex-1 min-w-0 bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500/60"
                     >
                       <option value="">Select a resume to import from...</option>
                       {resumes.map((r) => (
@@ -700,7 +715,7 @@ const PortfolioBuilder = () => {
                   after scale(0.55) is ~374px, so it fits without clipping
                   or squeezing the form column next to it. */}
               <div className="border border-[#20222c] rounded-xl" style={{ transform: "scale(0.55)", transformOrigin: "top left" }}>
-                <PortfolioPreview portfolio={portfolio} name={user?.name} />
+                <PortfolioPreview portfolio={portfolio} name={portfolio.displayName || user?.name} />
               </div>
             </div>
           </div>
@@ -730,7 +745,7 @@ const PortfolioBuilder = () => {
               </button>
             </div>
             <div className="border border-[#20222c] rounded-xl overflow-hidden">
-              <PortfolioPreview portfolio={portfolio} name={user?.name} />
+              <PortfolioPreview portfolio={portfolio} name={portfolio.displayName || user?.name} />
             </div>
           </div>
         </div>

@@ -33,9 +33,10 @@ const getOrCreatePortfolio = async (userId, userName) => {
 };
 
 const updatePortfolio = async (userId, payload) => {
-  const { headline, bio, skills, projects, links, slug } = payload;
+  const { displayName, headline, bio, skills, projects, links, slug } = payload;
 
   const data = {
+    ...(displayName !== undefined && { displayName }),
     ...(headline !== undefined && { headline }),
     ...(bio !== undefined && { bio }),
     ...(skills !== undefined && { skills }),
@@ -74,7 +75,7 @@ const getPublicPortfolio = async (slug) => {
     select: { name: true },
   });
 
-  return { ...portfolio, name: user?.name || "" };
+  return { ...portfolio, name: portfolio.displayName || user?.name || "" };
 };
 
 const importFromResume = async (userId, resumeId) => {

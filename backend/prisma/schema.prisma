@@ -151,6 +151,7 @@ model Portfolio {
 
   slug        String   @unique
 
+  displayName String?
   headline    String?
   bio         String?
   skills      String[]
