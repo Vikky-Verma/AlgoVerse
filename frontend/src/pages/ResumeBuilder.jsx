@@ -732,7 +732,7 @@ const ResumeBuilder = () => {
 
         <div className="min-w-0">{renderSection()}</div>
 
-        <div className="hidden xl:block">
+        <div className="hidden lg:block">
           <div className="sticky top-6">
             <div className="flex items-center justify-between bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-1.5 mb-2">
               <span className="text-[11px] font-medium text-slate-500">55%</span>

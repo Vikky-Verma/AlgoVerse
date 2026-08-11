@@ -422,7 +422,7 @@ const PortfolioBuilder = () => {
           />
         </div>
 
-        <div className="mt-6 grid lg:grid-cols-[180px_1fr] xl:grid-cols-[180px_1fr_390px] gap-6 items-start">
+        <div className="mt-6 grid lg:grid-cols-[180px_1fr_390px] gap-6 items-start">
           {/* Connected stepper rail */}
           <div className="hidden lg:block sticky top-6">
             <StepperRail sections={sectionStatus} activeId={activeSection} onSelect={setActiveSection} />
@@ -685,7 +685,7 @@ const PortfolioBuilder = () => {
             </div>
           </div>
 
-          <div className="hidden xl:block">
+          <div className="hidden lg:block">
             <div className="sticky top-6">
               <div
                 className="flex items-center justify-between bg-[#12141c] border border-[#20222c] rounded-lg px-3 py-1.5 mb-2"
