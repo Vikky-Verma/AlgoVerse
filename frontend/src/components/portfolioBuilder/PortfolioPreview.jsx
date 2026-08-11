@@ -1,157 +1,342 @@
-import { Code2, Briefcase, Globe, AtSign, ExternalLink, Sparkles } from "lucide-react";
+import {
+  ArrowUpRight,
+  BriefcaseBusiness,
+  ExternalLink,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Phone,
+  UserRound,
+} from "lucide-react";
 
-const AVATAR_COLORS = [
-  "#6366f1", "#0ea5e9", "#f59e0b", "#10b981", "#f43f5e", "#a855f7", "#14b8a6",
-];
+import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 
-const avatarColor = (name = "") => {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-};
+export default function PortfolioPreview({ portfolio }) {
+  const p = portfolio;
 
-const LINK_META = {
-  github: { icon: Code2, label: "GitHub" },
-  linkedin: { icon: Briefcase, label: "LinkedIn" },
-  website: { icon: Globe, label: "Website" },
-  twitter: { icon: AtSign, label: "Twitter" },
-};
-
-const normalizeUrl = (url) => {
-  if (!url) return "";
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
-};
-
-/**
- * Read-only rendering of what the public /portfolio/:slug page will look
- * like, sized to sit inside the builder as a live preview panel (mirrors
- * how ResumePreview works for the resume builder).
- */
-const PortfolioPreview = ({ portfolio, name }) => {
-  const links = Object.entries(portfolio?.links || {}).filter(([, v]) => v);
-  const skills = portfolio?.skills || [];
-  const projects = portfolio?.projects || [];
+  const githubUrl = p.links?.github || "#";
+  const linkedinUrl = p.links?.linkedin || "#";
 
   return (
     <div
       id="portfolio-to-print"
-      className="bg-[#0a0b10] text-slate-300 mx-auto"
-      style={{ width: "680px", minHeight: "760px" }}
+      className="w-full overflow-hidden rounded-xl border border-[#182238] bg-[#030712] text-white shadow-2xl"
     >
-      <div className="px-10 py-12">
-        <div className="flex items-start gap-4">
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold text-white shrink-0"
-            style={{ backgroundColor: avatarColor(name) }}
+      {/* NAVBAR */}
+      <nav className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+        <div className="text-sm font-bold">{p.name || "Your Name"}</div>
+
+        <div className="hidden gap-5 text-[10px] text-slate-400 md:flex">
+          <a href="#home" className="hover:text-white">
+            Home
+          </a>
+
+          <a href="#about" className="hover:text-white">
+            About
+          </a>
+
+          <a href="#skills" className="hover:text-white">
+            Skills
+          </a>
+
+          <a href="#experience" className="hover:text-white">
+            Experience
+          </a>
+
+          <a href="#projects" className="hover:text-white">
+            Projects
+          </a>
+
+          <a href="#contact" className="hover:text-white">
+            Contact
+          </a>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <a
+            href={githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-slate-300 hover:text-white"
           >
-            {name?.slice(0, 2).toUpperCase() || "P"}
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-extrabold text-white tracking-tight">
-              {name || "Your Name"}
+            <FaGithub size={13} />
+          </a>
+
+          <a
+            href={linkedinUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-slate-300 hover:text-white"
+          >
+            <FaLinkedinIn size={13} />
+          </a>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section
+        id="home"
+        className="relative min-h-[430px] overflow-hidden px-6 py-16"
+      >
+        {/* BACKGROUND */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(124,58,237,0.18),transparent_35%),radial-gradient(circle_at_30%_70%,rgba(168,85,247,0.08),transparent_30%)]" />
+
+        <div className="relative z-10 mx-auto grid max-w-5xl items-center gap-10 md:grid-cols-[1fr_220px]">
+          <div>
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-purple-400">
+              {p.tagline || "Full Stack Developer"}
+            </p>
+
+            <h1 className="text-4xl font-black leading-tight md:text-6xl">
+              {p.name || "Your Name"}
             </h1>
-            {portfolio?.headline && (
-              <p className="text-indigo-400 text-sm font-medium mt-1">{portfolio.headline}</p>
+
+            <p className="mt-5 max-w-xl text-sm leading-7 text-slate-400">
+              {p.about ||
+                "I build modern, scalable and user-friendly applications."}
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a
+                href="#projects"
+                className="flex items-center gap-2 rounded-md bg-purple-600 px-4 py-2 text-[10px] font-semibold text-white"
+              >
+                View My Work
+                <ArrowUpRight size={12} />
+              </a>
+            </div>
+          </div>
+
+          {/* PROFILE IMAGE */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="absolute -inset-2 rounded-full bg-purple-600/20 blur-xl" />
+
+              {p.profileImage ? (
+                <img
+                  src={p.profileImage}
+                  alt={p.name || "Profile"}
+                  className="relative h-44 w-44 rounded-full border-2 border-purple-500/50 object-cover"
+                />
+              ) : (
+                <div className="relative flex h-44 w-44 items-center justify-center rounded-full border-2 border-purple-500/50 bg-[#111827]">
+                  <UserRound size={55} className="text-slate-500" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="border-t border-white/10 px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-purple-400">
+            About Me
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold">About Me</h2>
+
+          <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-400">
+            {p.about ||
+              "I am a passionate developer who enjoys building useful and beautiful digital products."}
+          </p>
+        </div>
+      </section>
+
+      {/* SKILLS */}
+      <section id="skills" className="border-t border-white/10 px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-purple-400">
+            Skills
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold">Technologies I Work With</h2>
+
+          <div className="mt-7 flex flex-wrap gap-2">
+            {(p.skills || []).map((skill, index) => (
+              <span
+                key={index}
+                className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-[10px] text-slate-300"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EXPERIENCE */}
+      <section id="experience" className="border-t border-white/10 px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-center gap-2">
+            <BriefcaseBusiness size={16} className="text-purple-400" />
+
+            <h2 className="text-2xl font-bold">Experience</h2>
+          </div>
+
+          <div className="mt-7 space-y-5">
+            {(p.experience || []).map((item, index) => (
+              <div
+                key={index}
+                className="rounded-xl border border-white/10 bg-white/[0.02] p-5"
+              >
+                <h3 className="font-semibold">{item.role || item.title}</h3>
+
+                <p className="mt-1 text-[11px] text-purple-400">
+                  {item.company}
+                </p>
+
+                <p className="mt-3 text-xs leading-6 text-slate-400">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EDUCATION */}
+      <section className="border-t border-white/10 px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-center gap-2">
+            <GraduationCap size={16} className="text-purple-400" />
+
+            <h2 className="text-2xl font-bold">Education</h2>
+          </div>
+
+          <div className="mt-7 space-y-5">
+            {(p.education || []).map((item, index) => (
+              <div
+                key={index}
+                className="rounded-xl border border-white/10 bg-white/[0.02] p-5"
+              >
+                <h3 className="font-semibold">{item.degree}</h3>
+
+                <p className="mt-1 text-[11px] text-purple-400">
+                  {item.institution}
+                </p>
+
+                <p className="mt-2 text-xs text-slate-500">{item.year}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROJECTS */}
+      <section id="projects" className="border-t border-white/10 px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-purple-400">
+            Projects
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold">Featured Projects</h2>
+
+          <div className="mt-7 grid gap-5 md:grid-cols-2">
+            {(p.projects || []).map((project, index) => (
+              <div
+                key={index}
+                className="rounded-xl border border-white/10 bg-white/[0.02] p-5"
+              >
+                <h3 className="font-semibold">
+                  {project.title || project.name}
+                </h3>
+
+                <p className="mt-3 text-xs leading-6 text-slate-400">
+                  {project.description}
+                </p>
+
+                {project.technologies && (
+                  <p className="mt-4 text-[10px] text-purple-400">
+                    {Array.isArray(project.technologies)
+                      ? project.technologies.join(" • ")
+                      : project.technologies}
+                  </p>
+                )}
+
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex items-center gap-1 text-[10px] text-slate-300"
+                  >
+                    View Project
+                    <ExternalLink size={10} />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="border-t border-white/10 px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-purple-400">
+            Contact
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold">Let's Work Together</h2>
+
+          <div className="mt-7 grid gap-3 md:grid-cols-3">
+            {p.email && (
+              <a
+                href={`mailto:${p.email}`}
+                className="flex items-center gap-3 rounded-lg border border-white/10 p-4"
+              >
+                <Mail size={15} className="text-purple-400" />
+                <span className="text-xs text-slate-300">{p.email}</span>
+              </a>
+            )}
+
+            {p.phone && (
+              <div className="flex items-center gap-3 rounded-lg border border-white/10 p-4">
+                <Phone size={15} className="text-purple-400" />
+                <span className="text-xs text-slate-300">{p.phone}</span>
+              </div>
+            )}
+
+            {p.location && (
+              <div className="flex items-center gap-3 rounded-lg border border-white/10 p-4">
+                <MapPin size={15} className="text-purple-400" />
+                <span className="text-xs text-slate-300">{p.location}</span>
+              </div>
             )}
           </div>
         </div>
+      </section>
 
-        {portfolio?.bio && (
-          <p className="text-slate-400 text-[14px] leading-relaxed mt-5">{portfolio.bio}</p>
-        )}
-
-        {links.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mt-5">
-            {links.map(([key, value]) => {
-              const meta = LINK_META[key] || { icon: Globe, label: key };
-              const Icon = meta.icon;
-              return (
-                <span
-                  key={key}
-                  className="flex items-center gap-1.5 bg-[#12141c] border border-[#20222c] text-slate-300 text-xs font-medium rounded-lg px-2.5 py-1.5"
-                >
-                  <Icon size={12} />
-                  {meta.label}
-                </span>
-              );
-            })}
-          </div>
-        )}
-
-        {skills.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-[10.5px] font-semibold text-slate-500 uppercase tracking-wide mb-2.5">
-              Skills
-            </h2>
-            <div className="flex flex-wrap gap-1.5">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="bg-[#12141c] border border-[#20222c] text-slate-300 text-[11px] font-medium px-2 py-1 rounded-lg"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {projects.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-[10.5px] font-semibold text-slate-500 uppercase tracking-wide mb-2.5">
-              Projects
-            </h2>
-            <div className="grid grid-cols-2 gap-2.5">
-              {projects.map((project, idx) => (
-                <div
-                  key={idx}
-                  className="bg-[#12141c]/80 border border-[#20222c] rounded-xl p-3"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-white font-semibold text-[12.5px]">
-                      {project.name || "Untitled project"}
-                    </p>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {project.github && <Code2 size={11} className="text-slate-500" />}
-                      {project.link && <ExternalLink size={11} className="text-slate-500" />}
-                    </div>
-                  </div>
-                  {project.description && (
-                    <p className="text-slate-500 text-[11px] leading-relaxed mt-1 line-clamp-2">
-                      {project.description}
-                    </p>
-                  )}
-                  {project.techStack?.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {project.techStack.slice(0, 4).map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-[9.5px] font-medium text-slate-500 bg-[#0e0f16] border border-[#1c1e28] rounded px-1.5 py-0.5"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {links.length === 0 && skills.length === 0 && projects.length === 0 && !portfolio?.bio && (
-          <p className="text-slate-600 text-[12px] mt-8">
-            Fill in the sections on the left to see your public page take shape here.
+      {/* FOOTER */}
+      <footer className="border-t border-white/10 px-6 py-7">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <p className="text-[10px] text-slate-500">
+            © {new Date().getFullYear()} {p.name || "Your Name"}
           </p>
-        )}
 
-        <div className="mt-12 pt-5 border-t border-[#1c1e28] flex items-center justify-center gap-1.5">
-          <Sparkles size={10} className="text-slate-700" />
-          <p className="text-[10px] text-slate-700">Built with AI Resume Analyser</p>
+          <div className="flex gap-2">
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-400 hover:text-white"
+            >
+              <FaGithub size={14} />
+            </a>
+
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-400 hover:text-white"
+            >
+              <FaLinkedinIn size={14} />
+            </a>
+          </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
-};
-
-export default PortfolioPreview;
+}

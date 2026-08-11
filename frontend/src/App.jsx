@@ -1,5 +1,5 @@
 ﻿import { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {BrowserRouter,Routes,Route,} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -31,22 +31,59 @@ import Community from "./pages/Community";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 
-const App = () => {
-  useEffect(() => {
-    // Records a visit every time the app loads. Talks to your backend's
-    // /api/stats/visit endpoint, which increments SiteStats.visitCount.
-    const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-    fetch(`${apiBase}/api/stats/visit`, { method: "POST" }).catch((err) =>
-      console.error("Failed to record visit:", err)
-    );
+const App = () => {
+
+  useEffect(() => {
+
+    /*
+      Record a visit every time the application loads.
+
+      Your VITE_API_URL should ideally be:
+
+      http://localhost:8000
+
+      OR your deployed backend URL.
+
+      Example:
+
+      VITE_API_URL=https://your-backend.onrender.com
+    */
+
+    const apiBase =
+      import.meta.env.VITE_API_URL ||
+      "http://localhost:8000";
+
+    fetch(
+      `${apiBase}/api/stats/visit`,
+      {
+        method: "POST",
+      }
+    ).catch((err) => {
+
+      console.error(
+        "Failed to record visit:",
+        err
+      );
+
+    });
+
   }, []);
 
 
   return (
+
     <AuthProvider>
+
       <BrowserRouter>
+
+        {/* Global background */}
+
         <CosmicBackground />
+
+
+        {/* Toast notifications */}
+
         <Toaster
           position="top-right"
           toastOptions={{
@@ -59,15 +96,54 @@ const App = () => {
             },
           }}
         />
+
+
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/portfolio/:slug" element={<PortfolioPublic />} />
+
+          {/* =====================================
+              PUBLIC ROUTES
+          ===================================== */}
+
+          <Route
+            path="/"
+            element={<Landing />}
+          />
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/register"
+            element={<Register />}
+          />
+
+          <Route
+            path="/verify-otp"
+            element={<VerifyOtp />}
+          />
+
+          <Route
+            path="/pricing"
+            element={<Pricing />}
+          />
+
+          <Route
+            path="/portfolio/:slug"
+            element={<PortfolioPublic />}
+          />
+
+
+          {/* =====================================
+              PROTECTED APPLICATION ROUTES
+          ===================================== */}
 
           <Route element={<Layout />}>
+
+
+            {/* HOME */}
+
             <Route
               path="/home"
               element={
@@ -76,6 +152,10 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* COMMUNITY */}
+
             <Route
               path="/community"
               element={
@@ -84,6 +164,10 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* DASHBOARD */}
+
             <Route
               path="/dashboard"
               element={
@@ -92,6 +176,10 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* RESUME DETAIL */}
+
             <Route
               path="/resume/:resumeId"
               element={
@@ -100,6 +188,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                MOCK INTERVIEW
+            ================================= */}
+
             <Route
               path="/interview"
               element={
@@ -108,6 +202,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/interview/new"
               element={
@@ -116,14 +211,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/ats-checker"
-              element={
-                <ProtectedRoute>
-                  <ATSChecker />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/interview/:interviewId/room"
               element={
@@ -132,6 +220,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/interview/:interviewId/report"
               element={
@@ -140,6 +229,26 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                ATS CHECKER
+            ================================= */}
+
+            <Route
+              path="/ats-checker"
+              element={
+                <ProtectedRoute>
+                  <ATSChecker />
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* =================================
+                DSA
+            ================================= */}
+
             <Route
               path="/dsa-insights"
               element={
@@ -148,6 +257,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                PROJECT INTELLIGENCE
+            ================================= */}
+
             <Route
               path="/project-intelligence"
               element={
@@ -156,6 +271,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                AI ROADMAP
+            ================================= */}
+
             <Route
               path="/ai-roadmap"
               element={
@@ -164,6 +285,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                COMPANY PREPARATION
+            ================================= */}
+
             <Route
               path="/company-prep"
               element={
@@ -172,6 +299,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/company-prep/:slug"
               element={
@@ -180,6 +308,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                INTERNSHIP TRACKER
+            ================================= */}
+
             <Route
               path="/internship-tracker"
               element={
@@ -188,6 +322,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                ⭐ UPDATED RESUME BUILDER
+            ================================= */}
+
             <Route
               path="/resume-builder"
               element={
@@ -196,6 +336,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                PORTFOLIO BUILDER
+            ================================= */}
+
             <Route
               path="/portfolio-builder"
               element={
@@ -204,6 +350,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+
+            {/* =================================
+                PROGRESS
+            ================================= */}
+
             <Route
               path="/progress"
               element={
@@ -212,13 +364,37 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
+
+
+            {/* =================================
+                ABOUT
+            ================================= */}
+
+            <Route
+              path="/about"
+              element={<About />}
+            />
+
+
+            {/* =================================
+                CONTACT
+            ================================= */}
+
+            <Route
+              path="/contact"
+              element={<Contact />}
+            />
+
           </Route>
+
         </Routes>
+
       </BrowserRouter>
+
     </AuthProvider>
+
   );
-}
+};
+
 
 export default App;
